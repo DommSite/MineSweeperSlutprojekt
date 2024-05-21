@@ -13,160 +13,198 @@ namespace MineSweeperSlutprojekt
 {
     public partial class Form2 : Form
     {
-        private Button[][] buttons;
+        private Button[][] musknapp;
         private LogikSaker logik;
+
         public Form2()
         {
-            InitializeComponent();
+            Startup();
         }
 
-        public Form2(string text, int row, int col, int size, int mines) : this()
+        public Form2(string text, int rad, int kol, int storlek, int bomber) : this()
         {
             this.Text = text;
-            logik = new LogikSaker(row, col, mines);
-            this.ClientSize = new Size(col * size, row * size);
-            buttons = new Button[row][];
-            for (int i = 0; i<row; i++)
+            logik = new LogikSaker(rad, kol, bomber);
+            this.ClientSize = new Size(kol * storlek, rad * storlek);
+            musknapp = new Button[rad][];
+            for (int i = 0; i < rad; i++)
             {
-                buttons[i] = new Button[col];
-            }
-            foreach(int i in Enumerable.Range(0, row))
-            {
-                foreach (int j in Enumerable.Range(0, col))
+                musknapp[i] = new Button[kol];
+                for (int j = 0; j < kol; j++)
                 {
-                    buttons[i][j] = new Button();
-                    buttons[i][j].Text = "";
-                    buttons[i][j].BackColor= Color.White;
-                    buttons[i][j].Name = i + "," + j;
-                    buttons[i][j].Size = new Size(size, size);
-                    buttons[i][j].Location = new Point(size * j, size * i);
-                    buttons[i][j].UseVisualStyleBackColor = false;
-                    buttons[i][j].MouseUp += new MouseEventHandler(Button_Click);
-                    this.Controls.Add(buttons[i][j]);
+                    musknapp[i][j] = new Button
+                    {
+                        Text = "",
+                        BackColor = Color.White,
+                        Name = i + "," + j,
+                        Size = new Size(storlek, storlek),
+                        Location = new Point(storlek * j, storlek * i),
+                        UseVisualStyleBackColor = false
+                    };
+                    musknapp[i][j].MouseUp += new MouseEventHandler(mustryck);
+                    this.Controls.Add(musknapp[i][j]);
                 }
             }
         }
 
-        private void Button_Click(object sender, EventArgs e)
+        private void mustryck(object sender, MouseEventArgs e)
         {
             Button b = (Button)sender;
-            int temp = b.Name.IndexOf(",");
-            int x = Int16.Parse(b.Name.Substring(0, temp));
-            int y = Int16.Parse(b.Name.Substring(++temp));
+            int z = b.Name.IndexOf(",");
+            int x = int.Parse(b.Name.Substring(0, z));
+            int y = int.Parse(b.Name.Substring(z + 1));
+
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    if (!this.logik.Started)
+                    if (!logik.Startat)
                     {
-                        this.logik.Initialize(x, y);
+                        logik.Startup(x, y);
                     }
-                    int m = this.logik.CountMines(x,y);
-                    if (this.logik.IsMine(x, y))
-                    {
-                        b.BackColor = Color.Red;
-                        MessageBox.Show("Du förlorade, du tryckte på en mina");
-                        break;
-                    }
-                    if (this.logik.Discovered.Contains(x * buttons[0].Length + y))
-                    {
-                        break;
-                    }
-                    foreach(int a in this.logik.GetSafeIsland(x, y))
-                    {
-                        int i = a / buttons[0].Length;
-                        int j = a % buttons[0].Length;
-                        buttons[i][j].BackColor=Color.LightGray;
-                        int h = this.logik.CountMines(i,j);
-                        if(h > 0)
-                        {
-                            buttons[i][j].Text = h + "";
-                            buttons[i][j].BackColor = Color.LightBlue;
-                        }
-                        else
-                        {
-                            buttons[i][j].Enabled = false;
-                        }
-                    }
-                    if (logik.Win(x, y))
-                    {
-                        MessageBox.Show("Grattis, du vann");
-                    }
+                    Vänster(x, y);
                     break;
+
                 case MouseButtons.Right:
-                    if (this.logik.Discovered.Contains(x * buttons[0].Length + y))
-                    {
-                        break;
-                    }
-                    if (logik.Flagged.Contains(x * buttons[0].Length + y))
-                    {
-                        b.BackColor = Color.White;
-                        logik.Flagged.Remove(x * buttons[0].Length + y);
-                    }
-                    else
-                    {
-                        b.BackColor= Color.Green;
-                        logik.Flagged.Add(x * buttons[0].Length + y);
-                    }
+                    Höger(x, y, b);
                     break;
+
                 case MouseButtons.Middle:
-                    if (!this.logik.Discovered.Contains(x * buttons[0].Length + y))
-                    {
-                        break;
-                    }
-                    int Flagged_Count = 0;
-                    foreach(int k in this.logik.GetNeighbors(x, y))
-                    {
-                        if (logik.Flagged.Contains(k))
-                        {
-                            Flagged_Count++;
-                        }
-                    }
-                    if (this.logik.CountMines(x, y) != Flagged_Count)
-                    {
-                        break;
-                    }
-                    foreach(int k in this.logik.GetNeighbors(x, y))
-                    {
-                        if(logik.Flagged.Contains(k) || logik.Discovered.Contains(k))
-                        {
-                            continue;
-                        }
-                        if (this.logik.IsMine(k / buttons[0].Length, k % buttons[0].Length))
-                        {
-                            b.BackColor = Color.Red;
-                            MessageBox.Show("Du förlorade, du tryckte på en mina");
-                            break;
-                        }
-                        foreach(int l in this.logik.GetSafeIsland(k / buttons[0].Length, k % buttons[0].Length))
-                        {
-                            int i = l / buttons[0].Length;
-                            int j = l % buttons[0].Length;
-                            buttons[i][j].BackColor= Color.LightGray;
-                            int h = this.logik.CountMines(i, j);
-                            if (h > 0)
-                            {
-                                buttons[i][j].Text = h + "";
-                                buttons[i][j].BackColor=Color.LightBlue;
-                            }
-                            else
-                            {
-                                buttons[i][j].Enabled = false;
-                            }                           
-                        }
-                        if (logik.Win(x, y))
-                        {
-                            MessageBox.Show("Grattis, du vann");
-                        }                    
-                    }
+                    Skrollhjul(x, y, b);
                     break;
             }
         }
 
-        
+        private void Vänster(int x, int y)
+        {
+            if (logik.BombKoll(x, y))
+            {
+                VisaBomber();
+                StängAvInput();
+                MessageBox.Show("Du förlorade, du tryckte på en mina");
+                return;
+            }
+
+            if (logik.Upptäckt.Contains(x * musknapp[0].Length + y))
+                return;
+
+            foreach (int a in logik.GetSafeIsland(x, y))
+            {
+                int i = a / musknapp[0].Length;
+                int j = a % musknapp[0].Length;
+                musknapp[i][j].BackColor = Color.LightGray;
+                int h = logik.BombRäkning(i, j);
+                if (h > 0)
+                {
+                    musknapp[i][j].Text = h.ToString();
+                    musknapp[i][j].BackColor = Color.LightBlue;
+                }
+                else
+                {
+                    musknapp[i][j].Enabled = false;
+                }
+            }
+            if (logik.VinstKoll())
+            {
+                MessageBox.Show("Grattis, du vann");
+            }
+        }
+
+        private void Höger(int x, int y, Button b)
+        {
+            int index = x * musknapp[0].Length + y;
+            if (logik.Upptäckt.Contains(index))
+                return;
+
+            if (logik.Markerad.Contains(index))
+            {
+                b.BackColor = Color.White;
+                logik.Markerad.Remove(index);
+            }
+            else
+            {
+                b.BackColor = Color.Green;
+                logik.Markerad.Add(index);
+            }
+            if (logik.VinstKoll())
+            {
+                StängAvInput();
+                MessageBox.Show("Grattis, du vann");
+            }
+        }
+
+        private void Skrollhjul(int x, int y, Button b)
+        {
+            if (!logik.Upptäckt.Contains(x * musknapp[0].Length + y))
+                return;
+
+            int AntalMarkeringar = logik.GrannKoll(x, y).Count(n => logik.Markerad.Contains(n));
+
+            if (logik.BombRäkning(x, y) != AntalMarkeringar)
+                return;
+
+            foreach (int k in logik.GrannKoll(x, y))
+            {
+                if (logik.Markerad.Contains(k) || logik.Upptäckt.Contains(k))
+                    continue;
+
+                if (logik.BombKoll(k / musknapp[0].Length, k % musknapp[0].Length))
+                {
+                    b.BackColor = Color.Red;
+                    MessageBox.Show("Du förlorade, du tryckte på en mina");
+                    return;
+                }
+
+                foreach (int l in logik.GetSafeIsland(k / musknapp[0].Length, k % musknapp[0].Length))
+                {
+                    int i = l / musknapp[0].Length;
+                    int j = l % musknapp[0].Length;
+                    musknapp[i][j].BackColor = Color.LightGray;
+                    int h = logik.BombRäkning(i, j);
+                    if (h > 0)
+                    {
+                        musknapp[i][j].Text = h.ToString();
+                        musknapp[i][j].BackColor = Color.LightBlue;
+                    }
+                    else
+                    {
+                        musknapp[i][j].Enabled = false;
+                    }
+                }
+
+                if (logik.VinstKoll())
+                {
+                    MessageBox.Show("Grattis, du vann");
+                }
+            }
+        }
+        private void VisaBomber()
+        {
+            for (int i = 0; i < musknapp.Length; i++)
+            {
+                for (int j = 0; j < musknapp[i].Length; j++)
+                {
+                    if (logik.BombKoll(i, j))
+                    {
+                        musknapp[i][j].BackColor = Color.Red;
+                    }
+                }
+            }
+        }
+
+        private void StängAvInput()
+        {
+            foreach (Button[] rad in musknapp)
+            {
+                foreach (Button button in rad)
+                {
+                    button.Enabled = false;
+                }
+            }
+        }
 
         private void Form2_Load(object sender, EventArgs e)
         {
-
+            
         }
     }
 }

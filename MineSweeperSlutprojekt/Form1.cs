@@ -24,43 +24,44 @@ namespace MineSweeperSlutprojekt
 
         private void Play_Click(object sender, EventArgs e)
         {
-            int row = 0;
-            int col = 0;
-            int mines = 0;
+            int rad = 0;
+            int kol = 0;
+            int bomber = 0;
             string text = "";
             Form2 startsak = null;
             if (Easy.Checked)
             {
-                row = 9;
-                col = 9;
-                mines = 10;
+                rad = 9;
+                kol = 9;
+                bomber = 10;
                 text = "Easy";
             }
             else if (Medium.Checked)
             {
-                row = 16;
-                col = 16;
-                mines = 40;
+                rad = 16;
+                kol = 16;
+                bomber = 40;
                 text = "Medium";
             }
             else if (Hard.Checked)
             {
-                row = 16;
-                col = 30;
-                mines = 99;
+                rad = 16;
+                kol = 30;
+                bomber = 99;
                 text = "Hard";
             }
             else if (Impossible.Checked)
             {
-                row = 30;
-                col = 30;
-                mines = 800;
+                rad = 30;
+                kol = 30;
+                bomber = 800;
                 text = "Impossible";
             }
             else
                 return;
-            int size= Math.Min(30, 1000 / Math.Max(row,col));
-            startsak = new Form2(text, row, col, size, mines);
+            int storlek= Math.Min(30, 1000 / Math.Max(rad,kol));
+            startsak = new Form2(text, rad, kol, storlek, bomber);
+            startsak.Show();
         }
     }
 }
