@@ -79,6 +79,7 @@ namespace MineSweeperSlutprojekt
 
           if (logik.Markerad.Contains(index))
             {
+                MessageBox.Show("Test sak");
                 return;
             }
             
