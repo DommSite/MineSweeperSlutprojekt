@@ -61,7 +61,7 @@ namespace MineSweeperSlutprojekt
                     {
                         logik.Startup(x, y);
                     }
-                    Vänster(x, y);
+                    Vänster(x, y, b);
                     break;
 
                 case MouseButtons.Right:
@@ -74,16 +74,16 @@ namespace MineSweeperSlutprojekt
             }
         }
 
-        private void Vänster(int x, int y)
+        private void Vänster(int x, int y, Button b)
         {
             int index = x * musknapp[0].Length + y;
-            if (logik.Markerad.Contains(index))
+            if (logik.Markerad.Contains(x * musknapp[0].Length + y))
             {
                 MessageBox.Show("Test sak");
                 return;
             }
             
-            if (logik.BombKoll(x, y))
+            else if (logik.BombKoll(x, y))
             {
                 VisaBomber();
                 StängAvInput();
@@ -91,7 +91,7 @@ namespace MineSweeperSlutprojekt
                 return;
             }
 
-            if (logik.Upptäckt.Contains(x * musknapp[0].Length + y))
+            else if (logik.Upptäckt.Contains(x * musknapp[0].Length + y))
                 return;
 
             foreach (int a in logik.GetSafeIsland(x, y))
