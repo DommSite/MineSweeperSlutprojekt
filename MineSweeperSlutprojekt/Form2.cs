@@ -76,16 +76,17 @@ namespace MineSweeperSlutprojekt
 
         private void Vänster(int x, int y)
         {
+
+          if (logik.Markerad.Contains(index))
+            {
+                return;
+            }
+            
             if (logik.BombKoll(x, y))
             {
                 VisaBomber();
                 StängAvInput();
                 MessageBox.Show("Du förlorade, du tryckte på en mina");
-                return;
-            }
-
-            if (logik.Markerad.Contains(index))
-            {
                 return;
             }
 
