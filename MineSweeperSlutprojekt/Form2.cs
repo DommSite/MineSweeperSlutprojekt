@@ -76,8 +76,8 @@ namespace MineSweeperSlutprojekt
 
         private void Vänster(int x, int y)
         {
-
-          if (logik.Markerad.Contains(index))
+            int index = x * musknapp[0].Length + y;
+            if (logik.Markerad.Contains(index))
             {
                 MessageBox.Show("Test sak");
                 return;
