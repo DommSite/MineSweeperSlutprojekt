@@ -84,6 +84,11 @@ namespace MineSweeperSlutprojekt
                 return;
             }
 
+            if (logik.Markerad.Contains(index))
+            {
+                return;
+            }
+
             if (logik.Upptäckt.Contains(x * musknapp[0].Length + y))
                 return;
 
